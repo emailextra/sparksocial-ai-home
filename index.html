@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SparkSocial AI — Social Media Content, On Autopilot</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Syne', 'ui-sans-serif'],
+            body: ['Inter', 'ui-sans-serif'],
+          },
+          colors: {
+            warm: {
+              bg: '#FAFAF8',
+              border: '#E8E5DF',
+              muted: '#6B7280',
+            },
+            ink: '#0C0C10',
+            surface: '#161620',
+            indigo: {
+              DEFAULT: '#4338CA',
+              light: '#6366F1',
+              dark: '#3730A3',
+            },
+            amber: {
+              DEFAULT: '#D97706',
+              light: '#F59E0B',
+            },
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── base ── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: #FAFAF8; color: #0C0C10; }
+    .dark body { background: #0C0C10; color: #FAFAF8; }
+
+    /* ── dot grid hero bg ── */
+    .dot-grid {
+      background-image: radial-gradient(circle, #C8C4BC 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .dark .dot-grid {
+      background-image: radial-gradient(circle, #2a2a35 1px, transparent 1px);
+    }
+
+    /* ── display font ── */
+    .font-display { font-family: 'Syne', sans-serif; }
+
+    /* ── marquee ── */
+    @keyframes marquee {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .marquee-track { animation: marquee 22s linear infinite; white-space: nowrap; }
+    .marquee-track:hover { animation-play-state: paused; }
+
+    /* ── scroll reveal ── */
+    .reveal        { opacity: 0; transform: translateY(28px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal.in     { opacity: 1; transform: translateY(0); }
+    .reveal-l      { opacity: 0; transform: translateX(-28px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal-l.in   { opacity: 1; transform: translateX(0); }
+    .reveal-r      { opacity: 0; transform: translateX(28px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal-r.in   { opacity: 1; transform: translateX(0); }
+
+    /* ── underline hover link ── */
+    .hover-line {
+      position: relative;
+      display: inline-block;
+    }
+    .hover-line::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0;
+      width: 0; height: 1.5px;
+      background: #4338CA;
+      transition: width .25s ease;
+    }
+    .hover-line:hover::after { width: 100%; }
+
+    /* ── bento card ── */
+    .bento {
+      background: #161620;
+      border: 1px solid #22222e;
+      border-radius: 20px;
+      overflow: hidden;
+      transition: border-color .25s, transform .25s;
+    }
+    .bento:hover { border-color: #4338CA; transform: translateY(-3px); }
+
+    /* ── service row ── */
+    .service-row { transition: background .2s; }
+    .service-row:hover .service-num { color: #D97706; }
+    .service-row:hover { background: #F5F3EE; }
+    .dark .service-row:hover { background: #161620; }
+
+    /* ── step connector ── */
+    .step-dash {
+      flex: 1;
+      height: 1px;
+      border-top: 2px dashed #4338CA;
+      opacity: 0.35;
+      margin-top: 20px;
+    }
+
+    /* ── bar chart animation ── */
+    @keyframes growBar {
+      from { height: 0; }
+      to   { height: var(--h); }
+    }
+    .bar { animation: growBar 1.2s ease forwards; }
+
+    /* ── pricing toggle ── */
+    .plan-price { transition: opacity .25s, transform .25s; }
+
+    /* ── back to top ── */
+    #btt {
+      opacity: 0; transform: translateY(12px);
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+    }
+    #btt.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+    /* ── nav ── */
+    #nav {
+      transition: background .3s, box-shadow .3s, border-color .3s;
+    }
+
+    /* ── counter element ── */
+    .counter-el { font-variant-numeric: tabular-nums; }
+
+    /* ── scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-thumb { background: #4338CA; border-radius: 4px; }
+
+    /* ── dark mode surfaces ── */
+    .dark .warm-surface { background: #161620 !important; border-color: #22222e !important; }
+    .dark .warm-text    { color: #FAFAF8 !important; }
+    .dark .warm-muted   { color: #9CA3AF !important; }
+    .dark .warm-border  { border-color: #22222e !important; }
+    .dark .warm-bg      { background: #0C0C10 !important; }
+    .dark .warm-card    { background: #161620 !important; }
+    .dark .warm-input   { background: #1e1e2a !important; border-color: #2e2e3e !important; color: #FAFAF8 !important; }
+
+    /* ── fake caption mockup ── */
+    .caption-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: #6366F1;
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ── gradient word ── */
+    .word-amber { color: #D97706; }
+
+    /* ── quote mark ── */
+    .big-quote {
+      font-family: 'Syne', sans-serif;
+      font-size: 9rem;
+      line-height: 0.7;
+      color: #D97706;
+      opacity: 0.9;
+    }
+
+    /* ── pricing popular ── */
+    .plan-popular {
+      background: #4338CA;
+      color: #fff;
+    }
+    .plan-popular .plan-label { color: #a5b4fc; }
+    .plan-popular .plan-feature { color: #c7d2fe; }
+    .plan-popular .plan-feature-off { color: #6366f1; opacity: 0.5; }
+
+    /* ── workflow terminal ── */
+    .wf-card {
+      background: #FFFFFF;
+      border: 1.5px solid #E8E5DF;
+      border-radius: 20px;
+    }
+    .dark .wf-card { background: #161620; border-color: #22222e; }
+    .wf-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── grid line ── */
+    .grid-line { background: #E8E5DF; }
+    .dark .grid-line { background: #22222e; }
+  </style>
+</head>
+
+<body class="warm-bg transition-colors duration-300">
+
+<!-- ═══════════════════════════════
+     NAVIGATION
+═══════════════════════════════ -->
+<header id="nav" class="fixed top-0 left-0 right-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 lg:h-18">
+
+      <!-- Logo -->
+      <a href="#home" class="flex items-center gap-2.5 group">
+        <div class="w-8 h-8 rounded-lg bg-indigo flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-white" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 1l1.5 5H15l-4.5 3.3 1.7 5.2L8 11.3l-4.2 3.2 1.7-5.2L1 6h5.5z"/>
+          </svg>
+        </div>
+        <span class="font-display font-700 text-lg text-ink dark:text-warm-bg tracking-tight">
+          SparkSocial<span class="text-indigo">.</span>AI
+        </span>
+      </a>
+
+      <!-- Desktop links -->
+      <nav class="hidden md:flex items-center gap-7">
+        <a href="#home"          class="hover-line text-sm font-medium text-warm-muted dark:text-gray-400 hover:text-ink dark:hover:text-white transition-colors">Home</a>
+        <a href="#features"      class="hover-line text-sm font-medium text-warm-muted dark:text-gray-400 hover:text-ink dark:hover:text-white transition-colors">Features</a>
+        <a href="#services"      class="hover-line text-sm font-medium text-warm-muted dark:text-gray-400 hover:text-ink dark:hover:text-white transition-colors">Services</a>
+        <a href="#workflow"      class="hover-line text-sm font-medium text-warm-muted dark:text-gray-400 hover:text-ink dark:hover:text-white transition-colors">Workflow</a>
+        <a href="#pricing"       class="hover-line text-sm font-medium text-warm-muted dark:text-gray-400 hover:text-ink dark:hover:text-white transition-colors">Pricing</a>
+        <a href="#contact"       class="hover-line text-sm font-medium text-warm-muted dark:text-gray-400 hover:text-ink dark:hover:text-white transition-colors">Contact</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <!-- Dark toggle -->
+        <button id="darkToggle" aria-label="Toggle dark mode"
+          class="w-9 h-9 rounded-lg border border-warm-border dark:border-gray-700 flex items-center justify-center text-warm-muted dark:text-gray-400 hover:text-ink dark:hover:text-white hover:border-indigo dark:hover:border-indigo transition-all">
+          <svg id="ico-sun"  class="w-4 h-4 dark:hidden"  fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg id="ico-moon" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </button>
+
+        <a href="#contact" class="hidden md:inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo text-white text-sm font-semibold hover:bg-indigo-dark transition-colors">
+          Get started
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+
+        <!-- Mobile hamburger -->
+        <button id="mobileBtn" class="md:hidden w-9 h-9 rounded-lg border border-warm-border dark:border-gray-700 flex items-center justify-center text-warm-muted dark:text-gray-400 transition-all">
+          <svg id="ico-menu"  class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6"  x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          <svg id="ico-close" class="w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div id="mobileMenu" class="hidden md:hidden border-t border-warm-border dark:border-gray-800 bg-warm-bg dark:bg-ink">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-1">
+      <a href="#home"     class="mob-link px-3 py-2.5 rounded-lg text-sm font-medium text-ink dark:text-white hover:bg-warm-border/50 dark:hover:bg-surface transition-colors">Home</a>
+      <a href="#features" class="mob-link px-3 py-2.5 rounded-lg text-sm font-medium text-ink dark:text-white hover:bg-warm-border/50 dark:hover:bg-surface transition-colors">Features</a>
+      <a href="#services" class="mob-link px-3 py-2.5 rounded-lg text-sm font-medium text-ink dark:text-white hover:bg-warm-border/50 dark:hover:bg-surface transition-colors">Services</a>
+      <a href="#workflow" class="mob-link px-3 py-2.5 rounded-lg text-sm font-medium text-ink dark:text-white hover:bg-warm-border/50 dark:hover:bg-surface transition-colors">Workflow</a>
+      <a href="#pricing"  class="mob-link px-3 py-2.5 rounded-lg text-sm font-medium text-ink dark:text-white hover:bg-warm-border/50 dark:hover:bg-surface transition-colors">Pricing</a>
+      <a href="#contact"  class="mob-link px-3 py-2.5 rounded-lg text-sm font-medium text-ink dark:text-white hover:bg-warm-border/50 dark:hover:bg-surface transition-colors">Contact</a>
+      <a href="#contact"  class="mob-link mt-2 px-3 py-2.5 rounded-lg text-sm font-semibold text-center bg-indigo text-white">Get started →</a>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════
+     HERO
+═══════════════════════════════ -->
+<section id="home" class="dot-grid relative pt-32 pb-16 lg:pt-40 lg:pb-20 bg-warm-bg dark:bg-ink">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Badge -->
+    <div class="reveal inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-warm-border dark:border-gray-700 bg-white dark:bg-surface text-sm font-medium text-warm-muted dark:text-gray-400 mb-10">
+      <span class="w-2 h-2 rounded-full bg-amber flex-shrink-0"></span>
+      Generative AI for Small Business
+    </div>
+
+    <!-- Main heading + descriptor — asymmetric layout -->
+    <div class="flex flex-col lg:flex-row lg:items-end lg:gap-16 mb-14">
+      <h1 class="reveal font-display font-800 leading-[0.92] tracking-tight text-ink dark:text-white
+                 text-[clamp(3rem,10vw,7.5rem)] lg:max-w-4xl">
+        Social media<br/>
+        content,<br/>
+        <em class="not-italic word-amber">on autopilot.</em>
+      </h1>
+
+      <div class="reveal lg:pb-3 mt-8 lg:mt-0 lg:max-w-xs" style="transition-delay:.12s">
+        <p class="text-base text-warm-muted dark:text-gray-400 leading-relaxed mb-8">
+          SparkSocial AI generates professional captions, hashtags, and marketing visuals for your small business — automatically, in minutes.
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <a href="#contact"
+            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-indigo text-white text-sm font-semibold hover:bg-indigo-dark transition-colors">
+            Start for free
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="#workflow"
+            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-warm-border dark:border-gray-700 text-ink dark:text-white text-sm font-medium hover:border-indigo dark:hover:border-indigo transition-colors">
+            See how it works
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Horizontal rule -->
+    <div class="h-px bg-warm-border dark:bg-gray-800 mb-10"></div>
+
+    <!-- Trust strip -->
+    <div class="reveal flex flex-wrap items-center gap-x-10 gap-y-4 text-sm" style="transition-delay:.2s">
+      <span class="text-warm-muted dark:text-gray-500 font-medium">Trusted by:</span>
+      <span class="text-ink dark:text-gray-300 font-medium">Fitness Studios</span>
+      <span class="text-warm-border dark:text-gray-700">·</span>
+      <span class="text-ink dark:text-gray-300 font-medium">Cafés &amp; Restaurants</span>
+      <span class="text-warm-border dark:text-gray-700">·</span>
+      <span class="text-ink dark:text-gray-300 font-medium">Beauty Salons</span>
+      <span class="text-warm-border dark:text-gray-700">·</span>
+      <span class="text-ink dark:text-gray-300 font-medium">Retail Boutiques</span>
+      <span class="text-warm-border dark:text-gray-700">·</span>
+      <span class="text-ink dark:text-gray-300 font-medium">Local Services</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     MARQUEE STRIP
+═══════════════════════════════ -->
+<div class="bg-indigo overflow-hidden py-3 border-y-0">
+  <div class="marquee-track flex items-center gap-10">
+    <!-- repeat twice for seamless loop -->
+    <template id="marquee-items">
+      <span class="text-indigo-200 text-sm font-medium tracking-widest uppercase">Instagram</span>
+      <span class="text-indigo-300 opacity-50">—</span>
+      <span class="text-indigo-200 text-sm font-medium tracking-widest uppercase">Facebook</span>
+      <span class="text-indigo-300 opacity-50">—</span>
+      <span class="text-indigo-200 text-sm font-medium tracking-widest uppercase">LinkedIn</span>
+      <span class="text-indigo-300 opacity-50">—</span>
+      <span class="text-indigo-200 text-sm font-medium tracking-widest uppercase">TikTok</span>
+      <span class="text-indigo-300 opacity-50">—</span>
+      <span class="text-indigo-200 text-sm font-medium tracking-widest uppercase">Pinterest</span>
+      <span class="text-indigo-300 opacity-50">—</span>
+      <span class="text-indigo-200 text-sm font-medium tracking-widest uppercase">Twitter · X</span>
+      <span class="text-indigo-300 opacity-50">—</span>
+      <span class="text-indigo-200 text-sm font-medium tracking-widest uppercase">Threads</span>
+      <span class="text-indigo-300 opacity-50">—</span>
+    </template>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     FEATURES — BENTO GRID
+═══════════════════════════════ -->
+<section id="features" class="py-24 bg-ink">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="reveal flex flex-col lg:flex-row lg:items-end lg:justify-between mb-14 gap-6">
+      <h2 class="font-display font-800 text-4xl sm:text-5xl lg:text-6xl text-white leading-tight max-w-xl">
+        Everything you need<br/>to win on social.
+      </h2>
+      <p class="text-gray-400 text-base max-w-xs leading-relaxed">
+        One AI platform replacing the content team you can't afford to hire.
+      </p>
+    </div>
+
+    <!-- Bento grid: flex row → left col (A + C+D) | right col (B tall) -->
+    <div class="flex flex-col lg:flex-row gap-4">
+
+      <!-- ── Left column: 2/3 width ── -->
+      <div class="flex flex-col gap-4 lg:w-2/3">
+
+        <!-- A: AI Content Generation — full width of left col -->
+        <div class="reveal bento p-7" style="transition-delay:.05s">
+          <div class="flex items-start justify-between mb-5">
+            <div>
+              <div class="text-xs font-semibold text-indigo-light tracking-widest uppercase mb-1.5">01</div>
+              <h3 class="font-display font-700 text-xl text-white">AI Content Generation</h3>
+              <p class="text-gray-500 text-sm mt-1">Captions, promotional copy, and campaign scripts — generated to match your brand voice.</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-indigo/20 border border-indigo/30 flex items-center justify-center flex-shrink-0 ml-4">
+              <svg class="w-5 h-5 text-indigo-light" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </div>
+          </div>
+
+          <!-- Fake terminal / caption output -->
+          <div class="bg-[#080810] border border-[#1e1e2c] rounded-xl overflow-hidden">
+            <!-- Terminal bar -->
+            <div class="flex items-center gap-2 px-4 py-2.5 border-b border-[#1e1e2c] bg-[#0e0e18]">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f57]"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#febc2e]"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#28c840]"></span>
+              <span class="ml-3 text-[11px] text-gray-600 font-mono">caption_generator.ai</span>
+            </div>
+            <!-- Output lines -->
+            <div class="p-4 space-y-2 font-mono text-xs leading-relaxed">
+              <div class="flex gap-2">
+                <span class="text-gray-600 flex-shrink-0">$</span>
+                <span class="text-indigo-light">generate</span>
+                <span class="text-gray-500">--business</span>
+                <span class="text-amber">"FitLife Studio"</span>
+                <span class="text-gray-500">--goal</span>
+                <span class="text-amber">"Summer Bootcamp"</span>
+              </div>
+              <div class="h-px bg-[#1e1e2c] my-2"></div>
+              <div class="text-[#4ade80] text-[11px]">✓ Analysing brand voice...</div>
+              <div class="text-[#4ade80] text-[11px]">✓ Selecting optimal format for Instagram...</div>
+              <div class="text-[#4ade80] text-[11px] mb-3">✓ Drafting motivational caption...</div>
+              <div class="bg-[#131320] rounded-lg p-3 border border-[#22223a]">
+                <div class="text-white/90 leading-relaxed">
+                  Summer is here — and so is your strongest self. Join our 6-week bootcamp and transform before the season ends. Limited spots available.<span class="caption-cursor"></span>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-3 pt-1 text-[11px] text-gray-600">
+                <span>Tone: <span class="text-gray-400">Motivational</span></span>
+                <span>·</span>
+                <span>Platform: <span class="text-gray-400">Instagram</span></span>
+                <span>·</span>
+                <span>Length: <span class="text-gray-400">Medium</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- C + D: bottom row, side-by-side -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          <!-- C: AI Image Creation -->
+          <div class="reveal bento p-7" style="transition-delay:.15s">
+            <div class="text-xs font-semibold text-indigo-light tracking-widest uppercase mb-1.5">03</div>
+            <h3 class="font-display font-700 text-lg text-white mb-1">AI Image Creation</h3>
+            <p class="text-gray-500 text-xs mb-5">Marketing visuals generated for your brand in seconds.</p>
+
+            <!-- 2×2 image grid with larger tiles -->
+            <div class="grid grid-cols-2 gap-2">
+              <div class="aspect-video rounded-lg bg-gradient-to-br from-indigo/50 to-[#1a0050] border border-[#22222e] flex items-center justify-center">
+                <svg class="w-5 h-5 text-indigo-light opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9l4-4 4 4 4-5 6 8"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>
+              </div>
+              <div class="aspect-video rounded-lg bg-gradient-to-br from-amber/30 to-[#3a1800] border border-[#22222e] flex items-center justify-center">
+                <svg class="w-5 h-5 text-amber opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l5-5 4 4 3-3 5 6"/></svg>
+              </div>
+              <div class="aspect-video rounded-lg bg-gradient-to-br from-[#003a3a] to-[#001830] border border-[#22222e] flex items-center justify-center">
+                <svg class="w-5 h-5 text-cyan-500 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 12l6-6 3 3 5-5 5 5"/></svg>
+              </div>
+              <div class="aspect-video rounded-lg bg-gradient-to-br from-[#1a001a] to-[#200030] border border-[#22222e] flex items-center justify-center">
+                <svg class="w-5 h-5 text-purple-400 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M3 20l5-5 4 3 5-6 4 8"/></svg>
+              </div>
+            </div>
+            <p class="text-gray-700 text-[11px] mt-3">Optimised for Instagram · Facebook · LinkedIn</p>
+          </div>
+
+          <!-- D: Performance Analytics -->
+          <div class="reveal bento p-7" style="transition-delay:.2s">
+            <div class="text-xs font-semibold text-amber tracking-widest uppercase mb-1.5">04</div>
+            <h3 class="font-display font-700 text-lg text-white mb-1">Performance Analytics</h3>
+            <p class="text-gray-500 text-xs mb-5">Data-driven insights to keep improving every week.</p>
+
+            <!-- Bar chart with labels -->
+            <div class="flex items-end gap-1.5 h-24 mb-2">
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full rounded-t-md bg-indigo/40" style="height:52%"></div>
+                <span class="text-[10px] text-gray-600">M</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full rounded-t-md bg-indigo/60" style="height:68%"></div>
+                <span class="text-[10px] text-gray-600">T</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full rounded-t-md bg-indigo" style="height:42%"></div>
+                <span class="text-[10px] text-gray-600">W</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full rounded-t-md bg-indigo-light" style="height:82%"></div>
+                <span class="text-[10px] text-gray-600">T</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full rounded-t-md bg-amber/60" style="height:58%"></div>
+                <span class="text-[10px] text-gray-600">F</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full rounded-t-md bg-amber" style="height:96%"></div>
+                <span class="text-[10px] text-gray-600">S</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full rounded-t-md bg-amber/70" style="height:74%"></div>
+                <span class="text-[10px] text-gray-600">S</span>
+              </div>
+            </div>
+
+            <div class="h-px bg-[#1e1e2c] mb-3"></div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg>
+                <span class="text-green-400 text-xs font-semibold">+28% this week</span>
+              </div>
+              <span class="text-gray-600 text-[11px]">Engagement rate</span>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- end left col -->
+
+      <!-- ── Right column: 1/3 width, full height ── -->
+      <div class="lg:w-1/3">
+        <div class="reveal bento p-7 flex flex-col h-full" style="transition-delay:.1s">
+          <div class="mb-5">
+            <div class="text-xs font-semibold text-amber tracking-widest uppercase mb-1.5">02</div>
+            <h3 class="font-display font-700 text-xl text-white">Hashtag Intelligence</h3>
+            <p class="text-gray-500 text-sm mt-1">Trend-matched hashtags for maximum organic reach.</p>
+          </div>
+
+          <!-- Live updating label -->
+          <div class="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-[#0e0e18] border border-[#1e1e2c]">
+            <span class="relative flex h-2 w-2 flex-shrink-0">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-60"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span>
+            </span>
+            <span class="text-xs text-gray-500 font-mono">Scanning trending tags...</span>
+          </div>
+
+          <!-- Hashtag cloud -->
+          <div class="flex-1 flex flex-wrap gap-2 content-start">
+            <span class="px-3 py-1.5 rounded-full bg-indigo/20 border border-indigo/30 text-indigo-light text-xs font-medium">#FitnessMotivation</span>
+            <span class="px-2.5 py-1.5 rounded-full bg-amber/15 border border-amber/25 text-amber text-xs font-medium">#GymLife</span>
+            <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/8 text-gray-400 text-xs">#WorkoutGoals</span>
+            <span class="px-3 py-1.5 rounded-full bg-indigo/20 border border-indigo/30 text-indigo-light text-xs">#SmallBusiness</span>
+            <span class="px-2.5 py-1.5 rounded-full bg-white/5 border border-white/8 text-gray-500 text-xs">#LocalBusiness</span>
+            <span class="px-3 py-1.5 rounded-full bg-amber/15 border border-amber/25 text-amber text-xs font-medium">#Bootcamp2025</span>
+            <span class="px-2.5 py-1.5 rounded-full bg-white/5 border border-white/8 text-gray-500 text-xs">#SummerBody</span>
+            <span class="px-3 py-1.5 rounded-full bg-indigo/20 border border-indigo/30 text-indigo-light text-xs">#FitnessJourney</span>
+            <span class="px-2.5 py-1.5 rounded-full bg-white/5 border border-white/8 text-gray-500 text-xs">#GetFit</span>
+            <span class="px-3 py-1.5 rounded-full bg-amber/15 border border-amber/25 text-amber text-xs">#TrainHard</span>
+            <span class="px-2.5 py-1.5 rounded-full bg-white/5 border border-white/8 text-gray-400 text-xs">#WellnessLife</span>
+            <span class="px-3 py-1.5 rounded-full bg-indigo/20 border border-indigo/30 text-indigo-light text-xs">#HealthyLiving</span>
+          </div>
+
+          <!-- Stats footer -->
+          <div class="mt-6 pt-5 border-t border-[#22222e] space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-gray-600 text-xs">Tags generated</span>
+              <span class="text-white font-display font-700 text-sm">24 tags</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-gray-600 text-xs">Avg reach boost</span>
+              <span class="text-amber font-display font-700 text-lg">+340%</span>
+            </div>
+          </div>
+        </div>
+      </div><!-- end right col -->
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     SERVICES — NUMBERED ROWS
+═══════════════════════════════ -->
+<section id="services" class="py-24 bg-warm-bg dark:bg-ink">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="reveal flex flex-col md:flex-row md:items-end md:justify-between mb-16 gap-4">
+      <h2 class="font-display font-800 text-4xl sm:text-5xl text-ink dark:text-white leading-tight">
+        Our services
+      </h2>
+      <p class="text-warm-muted dark:text-gray-400 max-w-xs text-sm leading-relaxed">
+        A complete suite of AI tools built specifically for small business owners.
+      </p>
+    </div>
+
+    <div class="divide-y divide-warm-border dark:divide-gray-800">
+
+      <!-- 01 -->
+      <div class="service-row reveal cursor-default px-4 py-8 rounded-lg -mx-4 flex flex-col md:flex-row md:items-center gap-6 group" style="transition-delay:.05s">
+        <div class="service-num font-display font-800 text-5xl text-warm-border dark:text-gray-800 w-20 flex-shrink-0 transition-colors duration-200">01</div>
+        <div class="flex-1">
+          <h3 class="font-display font-700 text-2xl text-ink dark:text-white mb-2">AI Content Generation</h3>
+          <p class="text-warm-muted dark:text-gray-400 text-sm leading-relaxed max-w-lg">Automatically craft engaging captions, promotions, and full campaign scripts — matched to your brand tone and platform.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1 rounded-full bg-indigo/10 dark:bg-indigo/20 text-indigo dark:text-indigo-light text-xs font-medium">Captions</span>
+          <span class="px-3 py-1 rounded-full bg-indigo/10 dark:bg-indigo/20 text-indigo dark:text-indigo-light text-xs font-medium">Promotions</span>
+          <span class="px-3 py-1 rounded-full bg-indigo/10 dark:bg-indigo/20 text-indigo dark:text-indigo-light text-xs font-medium">Campaigns</span>
+        </div>
+      </div>
+
+      <!-- 02 -->
+      <div class="service-row reveal cursor-default px-4 py-8 rounded-lg -mx-4 flex flex-col md:flex-row md:items-center gap-6 group" style="transition-delay:.1s">
+        <div class="service-num font-display font-800 text-5xl text-warm-border dark:text-gray-800 w-20 flex-shrink-0 transition-colors duration-200">02</div>
+        <div class="flex-1">
+          <h3 class="font-display font-700 text-2xl text-ink dark:text-white mb-2">Hashtag Optimisation</h3>
+          <p class="text-warm-muted dark:text-gray-400 text-sm leading-relaxed max-w-lg">Data-driven hashtag research targeting your niche audience — updated with real-time trend analysis so you're always relevant.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1 rounded-full bg-amber/10 text-amber text-xs font-medium">Trend analysis</span>
+          <span class="px-3 py-1 rounded-full bg-amber/10 text-amber text-xs font-medium">Audience targeting</span>
+        </div>
+      </div>
+
+      <!-- 03 -->
+      <div class="service-row reveal cursor-default px-4 py-8 rounded-lg -mx-4 flex flex-col md:flex-row md:items-center gap-6 group" style="transition-delay:.15s">
+        <div class="service-num font-display font-800 text-5xl text-warm-border dark:text-gray-800 w-20 flex-shrink-0 transition-colors duration-200">03</div>
+        <div class="flex-1">
+          <h3 class="font-display font-700 text-2xl text-ink dark:text-white mb-2">AI Image Creation</h3>
+          <p class="text-warm-muted dark:text-gray-400 text-sm leading-relaxed max-w-lg">Custom-generated marketing graphics and social media visuals built for your brand — no designer or Canva skills required.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1 rounded-full bg-indigo/10 dark:bg-indigo/20 text-indigo dark:text-indigo-light text-xs font-medium">Marketing graphics</span>
+          <span class="px-3 py-1 rounded-full bg-indigo/10 dark:bg-indigo/20 text-indigo dark:text-indigo-light text-xs font-medium">Social visuals</span>
+        </div>
+      </div>
+
+      <!-- 04 -->
+      <div class="service-row reveal cursor-default px-4 py-8 rounded-lg -mx-4 flex flex-col md:flex-row md:items-center gap-6 group" style="transition-delay:.2s">
+        <div class="service-num font-display font-800 text-5xl text-warm-border dark:text-gray-800 w-20 flex-shrink-0 transition-colors duration-200">04</div>
+        <div class="flex-1">
+          <h3 class="font-display font-700 text-2xl text-ink dark:text-white mb-2">Analytics Reporting</h3>
+          <p class="text-warm-muted dark:text-gray-400 text-sm leading-relaxed max-w-lg">Smart performance reports with AI-powered recommendations delivered directly to your inbox every week.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1 rounded-full bg-amber/10 text-amber text-xs font-medium">Performance insights</span>
+          <span class="px-3 py-1 rounded-full bg-amber/10 text-amber text-xs font-medium">Engagement data</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     HOW IT WORKS — dark
+═══════════════════════════════ -->
+<section id="how-it-works" class="py-24 bg-ink">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="reveal mb-16">
+      <div class="text-xs font-semibold text-amber tracking-widest uppercase mb-4">Process</div>
+      <h2 class="font-display font-800 text-4xl sm:text-5xl text-white leading-tight">
+        From request to inbox<br/>in four steps.
+      </h2>
+    </div>
+
+    <!-- Steps: horizontal on desktop -->
+    <div class="flex flex-col lg:flex-row lg:items-start gap-0">
+
+      <!-- Step 1 -->
+      <div class="reveal flex lg:flex-col items-start lg:items-center flex-1 gap-4 lg:gap-0" style="transition-delay:.05s">
+        <div class="flex lg:flex-col items-center gap-4 lg:gap-0 w-full lg:w-auto">
+          <div class="w-10 h-10 rounded-full border-2 border-indigo flex items-center justify-center text-indigo font-display font-800 text-sm flex-shrink-0">1</div>
+          <div class="flex-1 lg:hidden h-px bg-warm-border/20 mt-5"></div>
+          <div class="hidden lg:flex items-center w-full">
+            <div class="step-dash mt-0 ml-0"></div>
+          </div>
+        </div>
+        <div class="lg:text-center lg:px-6 lg:mt-6 flex-1">
+          <div class="w-12 h-12 rounded-xl bg-indigo/15 border border-indigo/25 flex items-center justify-center mb-4 lg:mx-auto">
+            <svg class="w-5 h-5 text-indigo-light" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+          </div>
+          <h3 class="font-display font-700 text-white text-lg mb-2">Submit Request</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">Fill out a simple form with your business name, goals, and tone preferences.</p>
+        </div>
+      </div>
+
+      <!-- Connector (desktop) -->
+      <div class="hidden lg:block step-dash flex-1" style="margin-top:20px"></div>
+
+      <!-- Step 2 -->
+      <div class="reveal flex lg:flex-col items-start lg:items-center flex-1 gap-4 lg:gap-0 mt-8 lg:mt-0" style="transition-delay:.12s">
+        <div class="flex lg:flex-col items-center gap-4 lg:gap-0 w-full lg:w-auto">
+          <div class="w-10 h-10 rounded-full border-2 border-indigo flex items-center justify-center text-indigo font-display font-800 text-sm flex-shrink-0">2</div>
+        </div>
+        <div class="lg:text-center lg:px-6 lg:mt-6 flex-1">
+          <div class="w-12 h-12 rounded-xl bg-indigo/15 border border-indigo/25 flex items-center justify-center mb-4 lg:mx-auto">
+            <svg class="w-5 h-5 text-indigo-light" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          </div>
+          <h3 class="font-display font-700 text-white text-lg mb-2">AI Analysis</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">The SparkSocial AI agent studies your business profile and content objectives.</p>
+        </div>
+      </div>
+
+      <div class="hidden lg:block step-dash flex-1" style="margin-top:20px"></div>
+
+      <!-- Step 3 -->
+      <div class="reveal flex lg:flex-col items-start lg:items-center flex-1 gap-4 lg:gap-0 mt-8 lg:mt-0" style="transition-delay:.19s">
+        <div class="flex lg:flex-col items-center gap-4 lg:gap-0 w-full lg:w-auto">
+          <div class="w-10 h-10 rounded-full border-2 border-amber flex items-center justify-center text-amber font-display font-800 text-sm flex-shrink-0">3</div>
+        </div>
+        <div class="lg:text-center lg:px-6 lg:mt-6 flex-1">
+          <div class="w-12 h-12 rounded-xl bg-amber/10 border border-amber/20 flex items-center justify-center mb-4 lg:mx-auto">
+            <svg class="w-5 h-5 text-amber" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <h3 class="font-display font-700 text-white text-lg mb-2">Content Created</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">AI generates captions, hashtag sets, and visual prompts tailored to your brand.</p>
+        </div>
+      </div>
+
+      <div class="hidden lg:block step-dash flex-1" style="margin-top:20px"></div>
+
+      <!-- Step 4 -->
+      <div class="reveal flex lg:flex-col items-start lg:items-center flex-1 gap-4 lg:gap-0 mt-8 lg:mt-0" style="transition-delay:.26s">
+        <div class="flex lg:flex-col items-center gap-4 lg:gap-0 w-full lg:w-auto">
+          <div class="w-10 h-10 rounded-full border-2 border-amber flex items-center justify-center text-amber font-display font-800 text-sm flex-shrink-0">4</div>
+        </div>
+        <div class="lg:text-center lg:px-6 lg:mt-6 flex-1">
+          <div class="w-12 h-12 rounded-xl bg-amber/10 border border-amber/20 flex items-center justify-center mb-4 lg:mx-auto">
+            <svg class="w-5 h-5 text-amber" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <h3 class="font-display font-700 text-white text-lg mb-2">Auto Delivery</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">Your complete content package lands in your inbox — ready to publish.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     AI WORKFLOW
+═══════════════════════════════ -->
+<section id="workflow" class="py-24 bg-warm-bg dark:bg-ink">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="reveal mb-16 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+      <div>
+        <div class="text-xs font-semibold text-indigo dark:text-indigo-light tracking-widest uppercase mb-3">AI Pipeline</div>
+        <h2 class="font-display font-800 text-4xl sm:text-5xl text-ink dark:text-white leading-tight">
+          The full workflow,<br/>automated.
+        </h2>
+      </div>
+      <p class="text-warm-muted dark:text-gray-400 max-w-xs text-sm leading-relaxed">
+        From a single form submission to a fully packaged, email-delivered content kit — no manual steps.
+      </p>
+    </div>
+
+    <div class="reveal max-w-2xl mx-auto">
+      <div class="wf-card shadow-xl">
+        <!-- Terminal bar -->
+        <div class="flex items-center gap-2 px-6 py-4 border-b border-warm-border dark:border-gray-800">
+          <span class="w-3 h-3 rounded-full bg-red-400"></span>
+          <span class="w-3 h-3 rounded-full bg-amber"></span>
+          <span class="w-3 h-3 rounded-full bg-green-400"></span>
+          <span class="ml-3 text-xs text-warm-muted dark:text-gray-500 font-mono">sparksocial.pipeline</span>
+        </div>
+
+        <div class="px-6 py-6 space-y-0">
+
+          <!-- Node -->
+          <div class="wf-node flex items-center gap-4 py-3">
+            <div class="flex flex-col items-center w-10 flex-shrink-0">
+              <div class="wf-dot bg-indigo"></div>
+              <div class="w-px flex-1 min-h-[24px] bg-warm-border dark:bg-gray-800 mt-1"></div>
+            </div>
+            <div class="flex items-center justify-between flex-1">
+              <div>
+                <div class="text-sm font-semibold text-ink dark:text-white font-mono">Google Form</div>
+                <div class="text-xs text-warm-muted dark:text-gray-500">Client submits business details</div>
+              </div>
+              <span class="text-xs px-2 py-0.5 rounded bg-indigo/10 dark:bg-indigo/20 text-indigo dark:text-indigo-light font-medium">INPUT</span>
+            </div>
+          </div>
+
+          <div class="wf-node flex items-center gap-4 py-3">
+            <div class="flex flex-col items-center w-10 flex-shrink-0">
+              <div class="wf-dot bg-indigo-light"></div>
+              <div class="w-px flex-1 min-h-[24px] bg-warm-border dark:bg-gray-800 mt-1"></div>
+            </div>
+            <div class="flex items-center justify-between flex-1">
+              <div>
+                <div class="text-sm font-semibold text-ink dark:text-white font-mono">SparkSocial AI Agent</div>
+                <div class="text-xs text-warm-muted dark:text-gray-500">Analyses &amp; plans content strategy</div>
+              </div>
+              <span class="text-xs px-2 py-0.5 rounded bg-amber/10 text-amber font-medium">CORE</span>
+            </div>
+          </div>
+
+          <div class="wf-node flex items-center gap-4 py-3">
+            <div class="flex flex-col items-center w-10 flex-shrink-0">
+              <div class="wf-dot bg-amber"></div>
+              <div class="w-px flex-1 min-h-[24px] bg-warm-border dark:bg-gray-800 mt-1"></div>
+            </div>
+            <div class="flex items-center justify-between flex-1">
+              <div>
+                <div class="text-sm font-semibold text-ink dark:text-white font-mono">Content Generation</div>
+                <div class="text-xs text-warm-muted dark:text-gray-500">AI writes captions &amp; copy</div>
+              </div>
+              <span class="text-xs px-2 py-0.5 rounded bg-indigo/10 dark:bg-indigo/20 text-indigo dark:text-indigo-light font-medium">AI</span>
+            </div>
+          </div>
+
+          <div class="wf-node flex items-center gap-4 py-3">
+            <div class="flex flex-col items-center w-10 flex-shrink-0">
+              <div class="wf-dot bg-amber"></div>
+              <div class="w-px flex-1 min-h-[24px] bg-warm-border dark:bg-gray-800 mt-1"></div>
+            </div>
+            <div class="flex items-center justify-between flex-1">
+              <div>
+                <div class="text-sm font-semibold text-ink dark:text-white font-mono">Hashtag Generation</div>
+                <div class="text-xs text-warm-muted dark:text-gray-500">Trending &amp; niche hashtag sets</div>
+              </div>
+              <span class="text-xs px-2 py-0.5 rounded bg-indigo/10 dark:bg-indigo/20 text-indigo dark:text-indigo-light font-medium">AI</span>
+            </div>
+          </div>
+
+          <div class="wf-node flex items-center gap-4 py-3">
+            <div class="flex flex-col items-center w-10 flex-shrink-0">
+              <div class="wf-dot bg-indigo"></div>
+              <div class="w-px flex-1 min-h-[24px] bg-warm-border dark:bg-gray-800 mt-1"></div>
+            </div>
+            <div class="flex items-center justify-between flex-1">
+              <div>
+                <div class="text-sm font-semibold text-ink dark:text-white font-mono">Image Generation</div>
+                <div class="text-xs text-warm-muted dark:text-gray-500">AI creates marketing visuals</div>
+              </div>
+              <span class="text-xs px-2 py-0.5 rounded bg-indigo/10 dark:bg-indigo/20 text-indigo dark:text-indigo-light font-medium">AI</span>
+            </div>
+          </div>
+
+          <div class="wf-node flex items-center gap-4 py-3">
+            <div class="flex flex-col items-center w-10 flex-shrink-0">
+              <div class="wf-dot bg-green-500"></div>
+              <div class="w-px flex-1 min-h-[24px] bg-warm-border dark:bg-gray-800 mt-1"></div>
+            </div>
+            <div class="flex items-center justify-between flex-1">
+              <div>
+                <div class="text-sm font-semibold text-ink dark:text-white font-mono">Google Sheets Database</div>
+                <div class="text-xs text-warm-muted dark:text-gray-500">Content stored &amp; organised</div>
+              </div>
+              <span class="text-xs px-2 py-0.5 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium">STORE</span>
+            </div>
+          </div>
+
+          <div class="wf-node flex items-center gap-4 py-3">
+            <div class="flex flex-col items-center w-10 flex-shrink-0">
+              <div class="wf-dot bg-amber"></div>
+            </div>
+            <div class="flex items-center justify-between flex-1">
+              <div>
+                <div class="text-sm font-semibold text-ink dark:text-white font-mono">Email Delivery</div>
+                <div class="text-xs text-warm-muted dark:text-gray-500">Full package delivered to client</div>
+              </div>
+              <span class="text-xs px-2 py-0.5 rounded bg-amber/10 text-amber font-medium">OUTPUT</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     STATS — dark, typographic
+═══════════════════════════════ -->
+<section id="stats" class="py-24 bg-ink">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="reveal text-xs font-semibold text-amber tracking-widest uppercase mb-14">By the numbers</div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-0 divide-x divide-y lg:divide-y-0 divide-gray-800 border border-gray-800 rounded-2xl overflow-hidden">
+
+      <div class="reveal p-8 lg:p-10 flex flex-col gap-2" style="transition-delay:.05s">
+        <div class="font-display font-800 text-6xl lg:text-7xl text-white counter-el" data-target="500" id="c1">0</div>
+        <div class="text-xs text-gray-500 font-medium tracking-wide uppercase mt-1">Posts Generated</div>
+        <div class="text-amber text-xs font-medium">+</div>
+      </div>
+
+      <div class="reveal p-8 lg:p-10 flex flex-col gap-2" style="transition-delay:.1s">
+        <div class="font-display font-800 text-6xl lg:text-7xl text-white counter-el" data-target="100" id="c2">0</div>
+        <div class="text-xs text-gray-500 font-medium tracking-wide uppercase mt-1">Small Businesses</div>
+        <div class="text-amber text-xs font-medium">+</div>
+      </div>
+
+      <div class="reveal p-8 lg:p-10 flex flex-col gap-2" style="transition-delay:.15s">
+        <div class="font-display font-800 text-6xl lg:text-7xl text-white counter-el flex items-end gap-1">
+          <span data-target="95" id="c3">0</span><span class="text-4xl text-gray-600">%</span>
+        </div>
+        <div class="text-xs text-gray-500 font-medium tracking-wide uppercase mt-1">Client Satisfaction</div>
+        <div class="flex gap-1">
+          <span class="text-amber text-xs">★★★★★</span>
+        </div>
+      </div>
+
+      <div class="reveal p-8 lg:p-10 flex flex-col gap-2" style="transition-delay:.2s">
+        <div class="font-display font-800 text-6xl lg:text-7xl text-white counter-el flex items-end gap-1">
+          <span data-target="80" id="c4">0</span><span class="text-4xl text-gray-600">%</span>
+        </div>
+        <div class="text-xs text-gray-500 font-medium tracking-wide uppercase mt-1">Time Saved</div>
+        <div class="text-amber text-xs font-medium">vs. manual</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     PRICING
+═══════════════════════════════ -->
+<section id="pricing" class="py-24 bg-warm-bg dark:bg-ink">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="reveal mb-4">
+      <div class="text-xs font-semibold text-amber tracking-widest uppercase mb-4">Pricing</div>
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
+        <h2 class="font-display font-800 text-4xl sm:text-5xl text-ink dark:text-white leading-tight max-w-sm">
+          Simple, honest pricing.
+        </h2>
+        <!-- Annual/monthly toggle -->
+        <div class="flex items-center gap-3">
+          <span id="lbl-monthly" class="text-sm font-medium text-ink dark:text-white">Monthly</span>
+          <button id="billingToggle"
+            class="relative w-12 h-6 rounded-full bg-indigo transition-colors flex items-center px-1 cursor-pointer border-0">
+            <span id="toggleKnob" class="w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-300 translate-x-0"></span>
+          </button>
+          <span id="lbl-annual" class="text-sm font-medium text-warm-muted dark:text-gray-400">Annual
+            <span class="ml-1 px-1.5 py-0.5 rounded-full bg-amber/10 text-amber text-xs font-semibold">–20%</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <!-- Starter -->
+      <div class="reveal border border-warm-border dark:border-gray-800 rounded-2xl p-7 bg-white dark:bg-surface flex flex-col" style="transition-delay:.05s">
+        <div class="mb-6">
+          <div class="text-xs font-semibold text-warm-muted dark:text-gray-500 uppercase tracking-widest mb-4">Starter</div>
+          <div class="flex items-baseline gap-1 mb-1">
+            <span class="font-display font-800 text-4xl text-ink dark:text-white plan-price" data-monthly="49" data-annual="39">$49</span>
+            <span class="text-warm-muted dark:text-gray-500 text-sm">/mo</span>
+          </div>
+          <p class="text-warm-muted dark:text-gray-400 text-sm mt-2">Perfect for solo entrepreneurs.</p>
+        </div>
+        <ul class="space-y-3 flex-1 mb-8">
+          <li class="flex items-center gap-2.5 text-sm text-ink dark:text-gray-300"><svg class="w-4 h-4 text-indigo flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>20 AI posts / month</li>
+          <li class="flex items-center gap-2.5 text-sm text-ink dark:text-gray-300"><svg class="w-4 h-4 text-indigo flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Basic hashtag suggestions</li>
+          <li class="flex items-center gap-2.5 text-sm text-ink dark:text-gray-300"><svg class="w-4 h-4 text-indigo flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>5 AI image prompts</li>
+          <li class="flex items-center gap-2.5 text-sm text-ink dark:text-gray-300"><svg class="w-4 h-4 text-indigo flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Email delivery</li>
+          <li class="flex items-center gap-2.5 text-sm text-warm-muted dark:text-gray-600"><svg class="w-4 h-4 text-warm-border dark:text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Analytics dashboard</li>
+          <li class="flex items-center gap-2.5 text-sm text-warm-muted dark:text-gray-600"><svg class="w-4 h-4 text-warm-border dark:text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Priority support</li>
+        </ul>
+        <a href="#contact" class="block text-center py-2.5 px-5 rounded-lg border border-indigo text-indigo dark:text-indigo-light text-sm font-semibold hover:bg-indigo hover:text-white dark:hover:bg-indigo dark:hover:text-white transition-colors">Get started</a>
+      </div>
+
+      <!-- Growth — Popular -->
+      <div class="reveal plan-popular rounded-2xl p-7 flex flex-col relative shadow-2xl shadow-indigo/25 md:-mt-4 md:mb-4" style="transition-delay:.1s">
+        <div class="absolute top-5 right-5 px-2.5 py-0.5 rounded-full bg-amber text-ink text-xs font-bold">Most Popular</div>
+        <div class="mb-6">
+          <div class="plan-label text-xs font-semibold uppercase tracking-widest mb-4">Growth</div>
+          <div class="flex items-baseline gap-1 mb-1">
+            <span class="font-display font-800 text-4xl text-white plan-price" data-monthly="99" data-annual="79">$99</span>
+            <span class="text-indigo-200 text-sm">/mo</span>
+          </div>
+          <p class="text-indigo-200 text-sm mt-2">Best value for growing businesses.</p>
+        </div>
+        <ul class="space-y-3 flex-1 mb-8">
+          <li class="flex items-center gap-2.5 text-sm text-white"><svg class="w-4 h-4 text-amber flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>60 AI posts / month</li>
+          <li class="flex items-center gap-2.5 text-sm text-white"><svg class="w-4 h-4 text-amber flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Advanced hashtag optimisation</li>
+          <li class="flex items-center gap-2.5 text-sm text-white"><svg class="w-4 h-4 text-amber flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>20 AI marketing visuals</li>
+          <li class="flex items-center gap-2.5 text-sm text-white"><svg class="w-4 h-4 text-amber flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Email &amp; Sheets delivery</li>
+          <li class="flex items-center gap-2.5 text-sm text-white"><svg class="w-4 h-4 text-amber flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Analytics dashboard</li>
+          <li class="flex items-center gap-2.5 text-sm plan-feature-off"><svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Dedicated account manager</li>
+        </ul>
+        <a href="#contact" class="block text-center py-2.5 px-5 rounded-lg bg-white text-indigo text-sm font-bold hover:bg-blue-50 transition-colors">Get started</a>
+      </div>
+
+      <!-- Premium -->
+      <div class="reveal border border-warm-border dark:border-gray-800 rounded-2xl p-7 bg-white dark:bg-surface flex flex-col" style="transition-delay:.15s">
+        <div class="mb-6">
+          <div class="text-xs font-semibold text-warm-muted dark:text-gray-500 uppercase tracking-widest mb-4">Premium</div>
+          <div class="flex items-baseline gap-1 mb-1">
+            <span class="font-display font-800 text-4xl text-ink dark:text-white plan-price" data-monthly="199" data-annual="159">$199</span>
+            <span class="text-warm-muted dark:text-gray-500 text-sm">/mo</span>
+          </div>
+          <p class="text-warm-muted dark:text-gray-400 text-sm mt-2">Full-service for ambitious brands.</p>
+        </div>
+        <ul class="space-y-3 flex-1 mb-8">
+          <li class="flex items-center gap-2.5 text-sm text-ink dark:text-gray-300"><svg class="w-4 h-4 text-indigo flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Unlimited AI posts</li>
+          <li class="flex items-center gap-2.5 text-sm text-ink dark:text-gray-300"><svg class="w-4 h-4 text-indigo flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Premium hashtag intelligence</li>
+          <li class="flex items-center gap-2.5 text-sm text-ink dark:text-gray-300"><svg class="w-4 h-4 text-indigo flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Unlimited AI visuals</li>
+          <li class="flex items-center gap-2.5 text-sm text-ink dark:text-gray-300"><svg class="w-4 h-4 text-indigo flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Full analytics suite</li>
+          <li class="flex items-center gap-2.5 text-sm text-ink dark:text-gray-300"><svg class="w-4 h-4 text-indigo flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Priority support</li>
+          <li class="flex items-center gap-2.5 text-sm text-ink dark:text-gray-300"><svg class="w-4 h-4 text-indigo flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Dedicated account manager</li>
+        </ul>
+        <a href="#contact" class="block text-center py-2.5 px-5 rounded-lg border border-indigo text-indigo dark:text-indigo-light text-sm font-semibold hover:bg-indigo hover:text-white dark:hover:bg-indigo dark:hover:text-white transition-colors">Get started</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     TESTIMONIALS — dark, editorial
+═══════════════════════════════ -->
+<section id="testimonials" class="py-24 bg-ink">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="reveal mb-14">
+      <div class="text-xs font-semibold text-amber tracking-widest uppercase mb-4">Testimonials</div>
+      <h2 class="font-display font-800 text-4xl sm:text-5xl text-white leading-tight">
+        What our clients say.
+      </h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <!-- T1 -->
+      <div class="reveal flex flex-col border border-gray-800 rounded-2xl p-7 bg-surface hover:border-indigo/40 transition-colors group" style="transition-delay:.05s">
+        <div class="big-quote leading-none mb-2 group-hover:text-amber transition-colors">&ldquo;</div>
+        <blockquote class="text-gray-300 text-sm leading-relaxed flex-1 mb-6">
+          SparkSocial AI completely changed how I handle my gym's social media. We went from posting once a week to daily — our follower count doubled in two months and the hashtags actually bring in real clients.
+        </blockquote>
+        <div class="flex items-center gap-4 pt-5 border-t border-gray-800">
+          <div class="w-11 h-11 rounded-full bg-indigo flex items-center justify-center text-white font-display font-700 text-lg flex-shrink-0">J</div>
+          <div>
+            <div class="text-white font-semibold text-sm">Jessica Martinez</div>
+            <div class="text-gray-500 text-xs">Owner · FitLife Studio</div>
+          </div>
+          <div class="ml-auto text-amber text-xs tracking-wide">★★★★★</div>
+        </div>
+      </div>
+
+      <!-- T2 -->
+      <div class="reveal flex flex-col border border-gray-800 rounded-2xl p-7 bg-surface hover:border-indigo/40 transition-colors group" style="transition-delay:.12s">
+        <div class="big-quote leading-none mb-2 group-hover:text-amber transition-colors">&ldquo;</div>
+        <blockquote class="text-gray-300 text-sm leading-relaxed flex-1 mb-6">
+          As a café owner I have no time for marketing. SparkSocial sends me a full week of posts, hashtags, and visual ideas every Monday. My regulars say our Instagram looks like we have a whole marketing team.
+        </blockquote>
+        <div class="flex items-center gap-4 pt-5 border-t border-gray-800">
+          <div class="w-11 h-11 rounded-full bg-amber flex items-center justify-center text-ink font-display font-700 text-lg flex-shrink-0">R</div>
+          <div>
+            <div class="text-white font-semibold text-sm">Rajan Patel</div>
+            <div class="text-gray-500 text-xs">Owner · The Morning Brew Café</div>
+          </div>
+          <div class="ml-auto text-amber text-xs tracking-wide">★★★★★</div>
+        </div>
+      </div>
+
+      <!-- T3 -->
+      <div class="reveal flex flex-col border border-gray-800 rounded-2xl p-7 bg-surface hover:border-indigo/40 transition-colors group" style="transition-delay:.19s">
+        <div class="big-quote leading-none mb-2 group-hover:text-amber transition-colors">&ldquo;</div>
+        <blockquote class="text-gray-300 text-sm leading-relaxed flex-1 mb-6">
+          I used to spend 5 hours a week writing posts. Now SparkSocial does it in minutes and the results are better. The hashtag suggestions tripled our organic reach. I'm never going back to doing it manually.
+        </blockquote>
+        <div class="flex items-center gap-4 pt-5 border-t border-gray-800">
+          <div class="w-11 h-11 rounded-full bg-indigo-light flex items-center justify-center text-white font-display font-700 text-lg flex-shrink-0">S</div>
+          <div>
+            <div class="text-white font-semibold text-sm">Sofia Nguyen</div>
+            <div class="text-gray-500 text-xs">Owner · Luxe Beauty Salon</div>
+          </div>
+          <div class="ml-auto text-amber text-xs tracking-wide">★★★★★</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     CONTACT
+═══════════════════════════════ -->
+<section id="contact" class="py-24 bg-warm-bg dark:bg-ink">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid lg:grid-cols-2 gap-16 items-start">
+
+      <!-- Left -->
+      <div class="reveal reveal-l">
+        <div class="text-xs font-semibold text-amber tracking-widest uppercase mb-6">Get in touch</div>
+        <h2 class="font-display font-800 text-4xl sm:text-5xl lg:text-6xl text-ink dark:text-white leading-tight mb-8">
+          Let's build<br/>
+          something<br/>
+          <span class="word-amber">together.</span>
+        </h2>
+        <p class="text-warm-muted dark:text-gray-400 text-base leading-relaxed max-w-sm mb-10">
+          Fill out the form and we'll set up your personalised AI content pipeline within 24 hours.
+        </p>
+        <div class="space-y-5">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-lg border border-warm-border dark:border-gray-700 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-indigo" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div>
+              <div class="text-xs text-warm-muted dark:text-gray-500 uppercase font-medium tracking-wide">Email</div>
+              <div class="text-ink dark:text-white text-sm font-medium">hello@sparksocial.ai</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-lg border border-warm-border dark:border-gray-700 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-indigo" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013 5.18a2 2 0 011.99-2h3a2 2 0 012 1.72c.127 1.003.36 1.99.7 2.94a2 2 0 01-.45 2.11L9.09 10.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.95.34 1.937.574 2.94.7A2 2 0 0122 16.92z"/></svg>
+            </div>
+            <div>
+              <div class="text-xs text-warm-muted dark:text-gray-500 uppercase font-medium tracking-wide">Phone</div>
+              <div class="text-ink dark:text-white text-sm font-medium">+1 (555) 123-4567</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-lg border border-warm-border dark:border-gray-700 flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-indigo" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+              <div class="text-xs text-warm-muted dark:text-gray-500 uppercase font-medium tracking-wide">Response time</div>
+              <div class="text-ink dark:text-white text-sm font-medium">Within 24 hours, Mon–Fri</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: form -->
+      <div class="reveal reveal-r">
+        <div class="bg-white dark:bg-surface border border-warm-border dark:border-gray-800 rounded-2xl p-8">
+
+          <!-- Success -->
+          <div id="successBanner" class="hidden mb-6 flex items-start gap-3 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+            <svg class="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <div>
+              <div class="font-semibold text-green-700 dark:text-green-400 text-sm">Message sent!</div>
+              <div class="text-green-600 dark:text-green-500 text-xs mt-0.5">We'll be in touch within 24 hours.</div>
+            </div>
+          </div>
+
+          <form id="contactForm" novalidate class="space-y-5">
+
+            <div class="grid sm:grid-cols-2 gap-4">
+              <!-- Name -->
+              <div>
+                <label for="f-name" class="block text-xs font-semibold text-ink dark:text-white uppercase tracking-wide mb-2">Full Name *</label>
+                <input id="f-name" name="name" type="text" placeholder="Jane Smith"
+                  class="w-full px-4 py-3 rounded-xl border border-warm-border dark:border-gray-700 bg-warm-bg dark:bg-ink text-ink dark:text-white placeholder-warm-muted dark:placeholder-gray-600 text-sm focus:outline-none focus:border-indigo focus:ring-2 focus:ring-indigo/20 transition-all warm-input" />
+                <p class="err hidden mt-1.5 text-xs text-red-500">Required field.</p>
+              </div>
+              <!-- Email -->
+              <div>
+                <label for="f-email" class="block text-xs font-semibold text-ink dark:text-white uppercase tracking-wide mb-2">Email *</label>
+                <input id="f-email" name="email" type="email" placeholder="jane@example.com"
+                  class="w-full px-4 py-3 rounded-xl border border-warm-border dark:border-gray-700 bg-warm-bg dark:bg-ink text-ink dark:text-white placeholder-warm-muted dark:placeholder-gray-600 text-sm focus:outline-none focus:border-indigo focus:ring-2 focus:ring-indigo/20 transition-all warm-input" />
+                <p class="err hidden mt-1.5 text-xs text-red-500">Valid email required.</p>
+              </div>
+            </div>
+
+            <!-- Business -->
+            <div>
+              <label for="f-biz" class="block text-xs font-semibold text-ink dark:text-white uppercase tracking-wide mb-2">Business Name *</label>
+              <input id="f-biz" name="business" type="text" placeholder="My Business"
+                class="w-full px-4 py-3 rounded-xl border border-warm-border dark:border-gray-700 bg-warm-bg dark:bg-ink text-ink dark:text-white placeholder-warm-muted dark:placeholder-gray-600 text-sm focus:outline-none focus:border-indigo focus:ring-2 focus:ring-indigo/20 transition-all warm-input" />
+              <p class="err hidden mt-1.5 text-xs text-red-500">Required field.</p>
+            </div>
+
+            <!-- Message -->
+            <div>
+              <label for="f-msg" class="block text-xs font-semibold text-ink dark:text-white uppercase tracking-wide mb-2">Message *</label>
+              <textarea id="f-msg" name="message" rows="4" placeholder="Tell us about your business and social media goals..."
+                class="w-full px-4 py-3 rounded-xl border border-warm-border dark:border-gray-700 bg-warm-bg dark:bg-ink text-ink dark:text-white placeholder-warm-muted dark:placeholder-gray-600 text-sm focus:outline-none focus:border-indigo focus:ring-2 focus:ring-indigo/20 transition-all resize-none warm-input"></textarea>
+              <p class="err hidden mt-1.5 text-xs text-red-500">At least 20 characters required.</p>
+            </div>
+
+            <button type="submit"
+              class="w-full py-3 rounded-xl bg-indigo text-white text-sm font-semibold hover:bg-indigo-dark transition-colors flex items-center justify-center gap-2 group">
+              Send message
+              <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     FOOTER
+═══════════════════════════════ -->
+<footer class="bg-ink border-t border-gray-800">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-8">
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
+      <!-- Brand -->
+      <div>
+        <a href="#home" class="flex items-center gap-2 mb-4">
+          <div class="w-8 h-8 rounded-lg bg-indigo flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-white" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.5 5H15l-4.5 3.3 1.7 5.2L8 11.3l-4.2 3.2 1.7-5.2L1 6h5.5z"/></svg>
+          </div>
+          <span class="font-display font-700 text-lg text-white tracking-tight">SparkSocial<span class="text-indigo-light">.</span>AI</span>
+        </a>
+        <p class="text-gray-500 text-sm leading-relaxed mb-6 max-w-xs">
+          AI-powered social media content for small businesses — captions, hashtags, and visuals, automatically delivered.
+        </p>
+        <!-- Social icons -->
+        <div class="flex gap-2">
+          <a href="#" aria-label="Instagram" class="w-9 h-9 rounded-lg border border-gray-800 flex items-center justify-center text-gray-600 hover:text-white hover:border-gray-600 transition-colors">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </a>
+          <a href="#" aria-label="Facebook" class="w-9 h-9 rounded-lg border border-gray-800 flex items-center justify-center text-gray-600 hover:text-white hover:border-gray-600 transition-colors">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="#" aria-label="Twitter" class="w-9 h-9 rounded-lg border border-gray-800 flex items-center justify-center text-gray-600 hover:text-white hover:border-gray-600 transition-colors">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a href="#" aria-label="LinkedIn" class="w-9 h-9 rounded-lg border border-gray-800 flex items-center justify-center text-gray-600 hover:text-white hover:border-gray-600 transition-colors">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick links -->
+      <div>
+        <h4 class="text-white text-xs font-semibold uppercase tracking-widest mb-5">Navigation</h4>
+        <ul class="space-y-2.5 text-sm">
+          <li><a href="#home"         class="text-gray-500 hover:text-white transition-colors">Home</a></li>
+          <li><a href="#features"     class="text-gray-500 hover:text-white transition-colors">Features</a></li>
+          <li><a href="#services"     class="text-gray-500 hover:text-white transition-colors">Services</a></li>
+          <li><a href="#how-it-works" class="text-gray-500 hover:text-white transition-colors">How It Works</a></li>
+          <li><a href="#workflow"     class="text-gray-500 hover:text-white transition-colors">AI Workflow</a></li>
+          <li><a href="#pricing"      class="text-gray-500 hover:text-white transition-colors">Pricing</a></li>
+          <li><a href="#contact"      class="text-gray-500 hover:text-white transition-colors">Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Services -->
+      <div>
+        <h4 class="text-white text-xs font-semibold uppercase tracking-widest mb-5">Services</h4>
+        <ul class="space-y-2.5 text-sm">
+          <li><a href="#services" class="text-gray-500 hover:text-white transition-colors">AI Content Generation</a></li>
+          <li><a href="#services" class="text-gray-500 hover:text-white transition-colors">Hashtag Optimisation</a></li>
+          <li><a href="#services" class="text-gray-500 hover:text-white transition-colors">AI Image Creation</a></li>
+          <li><a href="#services" class="text-gray-500 hover:text-white transition-colors">Analytics Reporting</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <h4 class="text-white text-xs font-semibold uppercase tracking-widest mb-5">Contact</h4>
+        <ul class="space-y-3 text-sm">
+          <li class="text-gray-500">hello@sparksocial.ai</li>
+          <li class="text-gray-500">+1 (555) 123-4567</li>
+          <li class="text-gray-500">123 Innovation Drive<br/>San Francisco, CA 94105</li>
+          <li class="text-gray-600 text-xs">Mon–Fri · 9am–6pm PST</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pt-8 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600">
+      <span>&copy; 2026 SparkSocial AI. All rights reserved.</span>
+      <div class="flex gap-5">
+        <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+        <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+        <a href="#" class="hover:text-white transition-colors">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Back to top -->
+<button id="btt" class="fixed bottom-6 right-6 w-11 h-11 rounded-full bg-indigo text-white shadow-lg shadow-indigo/30 flex items-center justify-center z-50 hover:bg-indigo-dark transition-all" aria-label="Back to top">
+  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
+
+<!-- ═══════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════ -->
+<script>
+/* ─── helpers ─── */
+const $ = id => document.getElementById(id);
+const qs = sel => document.querySelector(sel);
+const qsa = sel => document.querySelectorAll(sel);
+
+/* ─── dark mode ─── */
+const html = document.documentElement;
+const saved = localStorage.getItem('ss-theme');
+if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme:dark)').matches)) {
+  html.classList.add('dark');
+}
+$('darkToggle').addEventListener('click', () => {
+  html.classList.toggle('dark');
+  localStorage.setItem('ss-theme', html.classList.contains('dark') ? 'dark' : 'light');
+});
+
+/* ─── mobile nav ─── */
+const mobileBtn  = $('mobileBtn');
+const mobileMenu = $('mobileMenu');
+const icoMenu    = $('ico-menu');
+const icoClose   = $('ico-close');
+let menuOpen = false;
+mobileBtn.addEventListener('click', () => {
+  menuOpen = !menuOpen;
+  mobileMenu.classList.toggle('hidden', !menuOpen);
+  icoMenu.classList.toggle('hidden', menuOpen);
+  icoClose.classList.toggle('hidden', !menuOpen);
+});
+qsa('.mob-link').forEach(el => el.addEventListener('click', () => {
+  menuOpen = false;
+  mobileMenu.classList.add('hidden');
+  icoMenu.classList.remove('hidden');
+  icoClose.classList.add('hidden');
+}));
+
+/* ─── navbar scroll ─── */
+const nav = $('nav');
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY > 30;
+  nav.style.background = scrolled
+    ? (html.classList.contains('dark') ? 'rgba(12,12,16,0.92)' : 'rgba(250,250,248,0.92)')
+    : 'transparent';
+  nav.style.backdropFilter = scrolled ? 'blur(16px)' : 'none';
+  nav.style.borderBottom   = scrolled ? '1px solid ' + (html.classList.contains('dark') ? '#1f1f2a' : '#E8E5DF') : '1px solid transparent';
+  nav.style.boxShadow      = scrolled ? '0 1px 20px rgba(0,0,0,0.08)' : 'none';
+}, { passive: true });
+
+/* ─── smooth scroll ─── */
+qsa('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+
+/* ─── scroll reveal ─── */
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); revealObs.unobserve(en.target); } });
+}, { threshold: 0.1 });
+qsa('.reveal, .reveal-l, .reveal-r').forEach(el => revealObs.observe(el));
+
+/* ─── marquee: inject items twice ─── */
+(function buildMarquee() {
+  const track = document.querySelector('.marquee-track');
+  const tpl   = $('marquee-items');
+  if (!track || !tpl) return;
+  const content = tpl.innerHTML;
+  track.innerHTML = content + content;
+  tpl.remove();
+})();
+
+/* ─── animated counters ─── */
+function animCount(el, target, dur = 1800) {
+  let start = null;
+  const step = ts => {
+    if (!start) start = ts;
+    const p = Math.min((ts - start) / dur, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.floor(ease * target);
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = target;
+  };
+  requestAnimationFrame(step);
+}
+let counted = false;
+const statsObs = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting && !counted) {
+    counted = true;
+    [['c1',500],['c2',100],['c3',95],['c4',80]].forEach(([id, val]) => {
+      const el = $(id); if (el) animCount(el, val);
+    });
+  }
+}, { threshold: 0.3 });
+const statsSection = $('stats');
+if (statsSection) statsObs.observe(statsSection);
+
+/* ─── pricing toggle ─── */
+let isAnnual = false;
+const toggleBtn  = $('billingToggle');
+const toggleKnob = $('toggleKnob');
+const lblMonthly = $('lbl-monthly');
+const lblAnnual  = $('lbl-annual');
+
+function updatePrices() {
+  qsa('.plan-price').forEach(el => {
+    const price = isAnnual ? el.dataset.annual : el.dataset.monthly;
+    el.textContent = '$' + price;
+  });
+  if (isAnnual) {
+    toggleKnob.style.transform = 'translateX(24px)';
+    lblAnnual.classList.replace('text-warm-muted', 'text-ink');
+    lblAnnual.classList.add('dark:text-white');
+    lblMonthly.classList.replace('text-ink', 'text-warm-muted');
+    lblMonthly.classList.add('dark:text-gray-400');
+  } else {
+    toggleKnob.style.transform = 'translateX(0)';
+    lblMonthly.classList.replace('text-warm-muted', 'text-ink');
+    lblMonthly.classList.remove('dark:text-gray-400');
+    lblAnnual.classList.replace('text-ink', 'text-warm-muted');
+  }
+}
+toggleBtn.addEventListener('click', () => { isAnnual = !isAnnual; updatePrices(); });
+
+/* ─── back to top ─── */
+const btt = $('btt');
+window.addEventListener('scroll', () => {
+  btt.classList.toggle('show', window.scrollY > 500);
+}, { passive: true });
+btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+/* ─── contact form ─── */
+function validEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+function fieldError(input, show) {
+  const p = input.parentElement.querySelector('.err');
+  if (show) {
+    input.classList.add('border-red-400');
+    input.classList.remove('border-warm-border');
+    if (p) p.classList.remove('hidden');
+  } else {
+    input.classList.remove('border-red-400');
+    if (p) p.classList.add('hidden');
+  }
+}
+
+const form    = $('contactForm');
+const success = $('successBanner');
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('f-name'), email = $('f-email'), biz = $('f-biz'), msg = $('f-msg');
+  let ok = true;
+
+  [name, biz].forEach(el => {
+    const valid = el.value.trim().length >= 2;
+    fieldError(el, !valid);
+    if (!valid) ok = false;
+  });
+  const emailValid = validEmail(email.value.trim());
+  fieldError(email, !emailValid);
+  if (!emailValid) ok = false;
+
+  const msgValid = msg.value.trim().length >= 20;
+  fieldError(msg, !msgValid);
+  if (!msgValid) ok = false;
+
+  if (ok) {
+    success.classList.remove('hidden');
+    form.reset();
+    success.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    setTimeout(() => success.classList.add('hidden'), 7000);
+  }
+});
+['f-name','f-email','f-biz','f-msg'].forEach(id => {
+  const el = $(id);
+  if (el) el.addEventListener('input', () => fieldError(el, false));
+});
+</script>
+</body>
+</html>
