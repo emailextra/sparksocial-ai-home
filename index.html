@@ -23,9 +23,9 @@
             ink: '#0C0C10',
             surface: '#161620',
             indigo: {
-              DEFAULT: '#4338CA',
-              light: '#6366F1',
-              dark: '#3730A3',
+              DEFAULT: '#0178F7',
+              light: '#3394F9',
+              dark: '#0162CC',
             },
             amber: {
               DEFAULT: '#D97706',
@@ -84,7 +84,7 @@
       position: absolute;
       bottom: -2px; left: 0;
       width: 0; height: 1.5px;
-      background: #4338CA;
+      background: #0178F7;
       transition: width .25s ease;
     }
     .hover-line:hover::after { width: 100%; }
@@ -97,7 +97,7 @@
       overflow: hidden;
       transition: border-color .25s, transform .25s;
     }
-    .bento:hover { border-color: #4338CA; transform: translateY(-3px); }
+    .bento:hover { border-color: #0178F7; transform: translateY(-3px); }
 
     /* ── service row ── */
     .service-row { transition: background .2s; }
@@ -109,7 +109,7 @@
     .step-dash {
       flex: 1;
       height: 1px;
-      border-top: 2px dashed #4338CA;
+      border-top: 2px dashed #0178F7;
       opacity: 0.35;
       margin-top: 20px;
     }
@@ -142,7 +142,7 @@
 
     /* ── scrollbar ── */
     ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-thumb { background: #4338CA; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: #0178F7; border-radius: 4px; }
 
     /* ── dark mode surfaces ── */
     .dark .warm-surface { background: #161620 !important; border-color: #22222e !important; }
@@ -158,7 +158,7 @@
       display: inline-block;
       width: 2px;
       height: 1em;
-      background: #6366F1;
+      background: #3394F9;
       margin-left: 2px;
       vertical-align: middle;
       animation: blink 1s step-end infinite;
@@ -179,12 +179,12 @@
 
     /* ── pricing popular ── */
     .plan-popular {
-      background: #4338CA;
+      background: #0178F7;
       color: #fff;
     }
-    .plan-popular .plan-label { color: #a5b4fc; }
-    .plan-popular .plan-feature { color: #c7d2fe; }
-    .plan-popular .plan-feature-off { color: #6366f1; opacity: 0.5; }
+    .plan-popular .plan-label { color: #93C5FD; }
+    .plan-popular .plan-feature { color: #BFDBFE; }
+    .plan-popular .plan-feature-off { color: #3394F9; opacity: 0.5; }
 
     /* ── workflow terminal ── */
     .wf-card {
@@ -330,20 +330,20 @@
   <div class="marquee-track flex items-center gap-10">
     <!-- repeat twice for seamless loop -->
     <template id="marquee-items">
-      <span class="text-indigo-200 text-sm font-medium tracking-widest uppercase">Instagram</span>
-      <span class="text-indigo-300 opacity-50">—</span>
-      <span class="text-indigo-200 text-sm font-medium tracking-widest uppercase">Facebook</span>
-      <span class="text-indigo-300 opacity-50">—</span>
-      <span class="text-indigo-200 text-sm font-medium tracking-widest uppercase">LinkedIn</span>
-      <span class="text-indigo-300 opacity-50">—</span>
-      <span class="text-indigo-200 text-sm font-medium tracking-widest uppercase">TikTok</span>
-      <span class="text-indigo-300 opacity-50">—</span>
-      <span class="text-indigo-200 text-sm font-medium tracking-widest uppercase">Pinterest</span>
-      <span class="text-indigo-300 opacity-50">—</span>
-      <span class="text-indigo-200 text-sm font-medium tracking-widest uppercase">Twitter · X</span>
-      <span class="text-indigo-300 opacity-50">—</span>
-      <span class="text-indigo-200 text-sm font-medium tracking-widest uppercase">Threads</span>
-      <span class="text-indigo-300 opacity-50">—</span>
+      <span class="text-blue-200 text-sm font-medium tracking-widest uppercase">Instagram</span>
+      <span class="text-blue-300 opacity-50">—</span>
+      <span class="text-blue-200 text-sm font-medium tracking-widest uppercase">Facebook</span>
+      <span class="text-blue-300 opacity-50">—</span>
+      <span class="text-blue-200 text-sm font-medium tracking-widest uppercase">LinkedIn</span>
+      <span class="text-blue-300 opacity-50">—</span>
+      <span class="text-blue-200 text-sm font-medium tracking-widest uppercase">TikTok</span>
+      <span class="text-blue-300 opacity-50">—</span>
+      <span class="text-blue-200 text-sm font-medium tracking-widest uppercase">Pinterest</span>
+      <span class="text-blue-300 opacity-50">—</span>
+      <span class="text-blue-200 text-sm font-medium tracking-widest uppercase">Twitter · X</span>
+      <span class="text-blue-300 opacity-50">—</span>
+      <span class="text-blue-200 text-sm font-medium tracking-widest uppercase">Threads</span>
+      <span class="text-blue-300 opacity-50">—</span>
     </template>
   </div>
 </div>
@@ -945,9 +945,9 @@
           <div class="plan-label text-xs font-semibold uppercase tracking-widest mb-4">Growth</div>
           <div class="flex items-baseline gap-1 mb-1">
             <span class="font-display font-800 text-4xl text-white plan-price" data-monthly="99" data-annual="79">$99</span>
-            <span class="text-indigo-200 text-sm">/mo</span>
+            <span class="text-blue-200 text-sm">/mo</span>
           </div>
-          <p class="text-indigo-200 text-sm mt-2">Best value for growing businesses.</p>
+          <p class="text-blue-200 text-sm mt-2">Best value for growing businesses.</p>
         </div>
         <ul class="space-y-3 flex-1 mb-8">
           <li class="flex items-center gap-2.5 text-sm text-white"><svg class="w-4 h-4 text-amber flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>60 AI posts / month</li>
